@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>For Cheeky Bones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. Password gate -->
+  <section id="gate" class="screen active">
+    <h1>Hey, Cheeky Bones</h1>
+    <p>Enter the secret code to open this.</p>
+    <input id="code" type="password" inputmode="numeric" placeholder="Hint: your birthday" autocomplete="off">
+    <button id="unlock">Open</button>
+    <p id="gate-error" class="error" role="alert"></p>
+  </section>
+
+  <!-- 2. Typed greeting -->
+  <section id="greeting" class="screen">
+    <p id="typed" class="typed" aria-live="polite"></p>
+    <button id="to-game" class="hidden">Okay, I'm ready</button>
+  </section>
+
+  <!-- 3. Mini game (placeholder: replace with the real game) -->
+  <section id="game" class="screen">
+    <h2>One little thing first</h2>
+    <div id="game-area">
+      <p>The game goes here.</p>
+    </div>
+    <button id="to-reasons">Skip for now</button>
+  </section>
+
+  <!-- 4. Reasons -->
+  <section id="reasons" class="screen">
+    <h2>Reasons I love you</h2>
+    <button id="reason-card" class="card" aria-live="polite"></button>
+    <p id="reason-count" class="small"></p>
+  </section>
+
+  <!-- 5. Letter -->
+  <section id="letter" class="screen">
+    <article id="letter-body" class="letter"></article>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
