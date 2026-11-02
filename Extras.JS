@@ -15,7 +15,7 @@ const LETTER_PHOTO = "images/me.jpg";    // your photo (his favorite): backgroun
 
 /* PAGE 2: your voice + synced text. Record it, save as audio/greeting.mp3, then set GREETING_AUDIO.
    Leave "" to show the text typing on its own (no voice). */
-const GREETING_AUDIO = "";               // e.g. "audio/greeting.mp3"
+const GREETING_AUDIO = "audio/greeting.mp3";               // e.g. "audio/greeting.mp3"
 const GREETING_LINES = [
   "Molo Bab' Ntuli,",
   "Tshezi,",
