@@ -188,47 +188,47 @@ const DEV = true;                        // previews: index.html#greeting / #syn
     later(() => e.remove(), 1700);
   }
 
+  // function level1() {
+  //   const a = area();
+  //   a.className = "match";
+  //   a.innerHTML = "";
+  //   setSub("Level 1: match our memories.");
+  //   setProgress(0, 6, "Pairs found");
+  //   const grid = el("div", "grid");
+  //   const cap = el("p", "cap", "Flip two cards to find a pair.");
+  //   const deck = PHOTOS.slice(0, 6).flatMap((_, i) => [i, i]).sort(() => Math.random() - 0.5);
+  //   let first = null, lock = false, found = 0;
+
+  //   deck.forEach((i) => {
+  //     const c = el("button", "mcard",
+  //       `<span class="inner"><span class="face front">🤍</span>` +
+  //       `<span class="face back" style="background-image:url('${PHOTOS[i].src}')"></span></span>`);
+  //     c.dataset.i = i;
+  //     c.setAttribute("aria-label", "Memory card");
+  //     c.onclick = () => {
+  //       if (lock || c.classList.contains("flipped")) return;
+  //       c.classList.add("flipped");
+  //       if (!first) { first = c; return; }
+  //       const other = first;
+  //       first = null;
+  //       lock = true;
+  //       if (other.dataset.i === c.dataset.i) {
+  //         other.classList.add("matched");
+  //         c.classList.add("matched");
+  //         cap.textContent = PHOTOS[i].cap;
+  //         setProgress(++found, 6, "Pairs found");
+  //         lock = false;
+  //         if (found === 6) later(() => panel("You remembered us. Now for the real test...", "Level 2", level2), 1500);
+  //       } else {
+  //         later(() => { other.classList.remove("flipped"); c.classList.remove("flipped"); lock = false; }, 800);
+  //       }
+  //     };
+  //     grid.appendChild(c);
+  //   });
+  //   a.append(grid, cap);
+  // }
+
   function level1() {
-    const a = area();
-    a.className = "match";
-    a.innerHTML = "";
-    setSub("Level 1: match our memories.");
-    setProgress(0, 6, "Pairs found");
-    const grid = el("div", "grid");
-    const cap = el("p", "cap", "Flip two cards to find a pair.");
-    const deck = PHOTOS.slice(0, 6).flatMap((_, i) => [i, i]).sort(() => Math.random() - 0.5);
-    let first = null, lock = false, found = 0;
-
-    deck.forEach((i) => {
-      const c = el("button", "mcard",
-        `<span class="inner"><span class="face front">🤍</span>` +
-        `<span class="face back" style="background-image:url('${PHOTOS[i].src}')"></span></span>`);
-      c.dataset.i = i;
-      c.setAttribute("aria-label", "Memory card");
-      c.onclick = () => {
-        if (lock || c.classList.contains("flipped")) return;
-        c.classList.add("flipped");
-        if (!first) { first = c; return; }
-        const other = first;
-        first = null;
-        lock = true;
-        if (other.dataset.i === c.dataset.i) {
-          other.classList.add("matched");
-          c.classList.add("matched");
-          cap.textContent = PHOTOS[i].cap;
-          setProgress(++found, 6, "Pairs found");
-          lock = false;
-          if (found === 6) later(() => panel("You remembered us. Now for the real test...", "Level 2", level2), 1500);
-        } else {
-          later(() => { other.classList.remove("flipped"); c.classList.remove("flipped"); lock = false; }, 800);
-        }
-      };
-      grid.appendChild(c);
-    });
-    a.append(grid, cap);
-  }
-
-  function level2() {
     const a = area();
     a.className = "";
     a.innerHTML = "";
