@@ -1,21 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="extras.css">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>For Cheeky Bones</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <title>For CheekyBones</title>
+
+  <!-- Fonts via Fontsource CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/fraunces/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/nunito/index.css">
+
+  <style>
+    /* =====================================================
+       PALETTE — Sunset Warm (peach / coral / amber / plum)
+       ===================================================== */
+    :root {
+      --bg:        #1F1220;   /* deep plum night          */
+      --bg-2:      #2A1730;   /* plum                     */
+      --plum:      #3A1F33;   /* warm plum                */
+      --coral:     #FF8A5C;   /* coral / sunset orange    */
+      --amber:     #FFB26B;   /* amber                    */
+      --peach:     #FFD59E;   /* light peach              */
+      --gold:      #FFC971;   /* champagne gold           */
+      --rose:      #E86A92;   /* sunset pink              */
+      --cream:     #FFF3E4;   /* warm cream               */
+      --text:      #FBE7D3;
+      --muted:     rgba(251, 231, 211, 0.62);
+      --error:     #FF8A80;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+
+    body {
+      background:
+        radial-gradient(1200px 800px at 84% -12%, rgba(255,138,92,0.34), transparent 58%),
+        radial-gradient(1000px 720px at -12% 20%, rgba(232,106,146,0.24), transparent 55%),
+        radial-gradient(1400px 900px at 50% 118%, rgba(255,178,107,0.22), transparent 60%),
+        linear-gradient(165deg, #2A1730 0%, #3A1F33 48%, #241222 100%);
+      color: var(--text);
+      font-family: "Nunito Variable", system-ui, sans-serif;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* big soft sunset glow orbs floating behind everything */
+    .glow {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none; z-index: 0;
+      animation: breathe 11s ease-in-out infinite alternate;
+    }
+    #glow-1 {
+      width: 42vmax; height: 42vmax;
+      top: -14vmax; right: -12vmax;
+      background: radial-gradient(circle, rgba(255,138,92,0.55), transparent 66%);
+    }
+    #glow-2 {
+      width: 38vmax; height: 38vmax;
+      bottom: -12vmax; left: -14vmax;
+      background: radial-gradient(circle, rgba(232,106,146,0.48), transparent 66%);
+      animation-delay: -4s;
+    }
+    @keyframes breathe {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to   { transform: translate3d(3vmax, -2vmax, 0) scale(1.12); }
+    }
+
+    /* twinkling sparkle dots */
+    .twinkle {
+      position: fixed; pointer-events: none; z-index: 0;
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px 2px rgba(255,201,113,0.55);
+      animation: twinkle var(--twdur, 3s) ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.12; transform: scale(0.55); }
+      50%      { opacity: 0.9;  transform: scale(1.35); }
+    }
+
+    /* soft floating hearts in the background */
+    .bg-hearts {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .bg-hearts span {
+      position: absolute; bottom: -8%;
+      font-size: 1rem; opacity: 0.08; color: var(--cream);
+      animation: drift linear infinite;
+    }
+    @keyframes drift {
+      to { transform: translateY(-115vh) rotate(14deg); }
+    }
+
+    /* =====================================================
+       SCREENS
+       ===================================================== */
+    .screen {
+      display: none;
+      position: relative; z-index: 1;
+      min-height: 100dvh;
+      padding: 2.5rem 1.4rem;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 1.1rem;
+    }
+    .screen.active { display: flex; animation: screenIn .7s ease both; }
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    h1, h2 {
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-weight: 500;
+      margin: 0;
+      letter-spacing: 0.01em;
+    }
+    h1 {
+      font-size: clamp(2rem, 8vw, 3.3rem);
+      font-style: italic;
+      background: linear-gradient(115deg, var(--peach) 8%, var(--coral) 55%, var(--rose) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      filter: drop-shadow(0 4px 22px rgba(255,138,92,0.35));
+    }
+    h2 {
+      font-size: clamp(1.45rem, 6vw, 2.1rem);
+      color: var(--cream);
+      text-shadow: 0 2px 24px rgba(255,178,107,0.4);
+    }
+
+    .sub { color: var(--muted); margin: 0; max-width: 30rem; }
+
+    .rule {
+      width: 3.4rem; height: 2px; border-radius: 2px; margin: 0.2rem auto;
+      background: linear-gradient(90deg, var(--coral), var(--gold), var(--rose));
+      position: relative; overflow: hidden;
+    }
+    .rule::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,243,228,0.8), transparent);
+      transform: translateX(-100%);
+      animation: shimmer 2.6s ease-in-out infinite;
+    }
+    @keyframes shimmer { 60%, 100% { transform: translateX(100%); } }
+
+    /* =====================================================
+       CONTROLS
+       ===================================================== */
+    input, button {
+      font: inherit;
+      border-radius: 999px;
+      padding: 0.8rem 1.6rem;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease, opacity .3s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    input {
+      background: rgba(255,243,228,0.08);
+      color: var(--cream);
+      border: 1.5px solid rgba(255,178,107,0.5);
+      text-align: center;
+      width: min(18rem, 100%);
+    }
+    input::placeholder { color: var(--muted); }
+    input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 4px rgba(255,178,107,0.15); }
+
+    button {
+      background: linear-gradient(135deg, var(--coral), var(--amber));
+      color: #3A1526;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(255,138,92,0.35);
+    }
+    button:hover { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 12px 30px rgba(255,138,92,0.5); }
+    button:active { transform: translateY(0); }
+
+    .ghost {
+      background: transparent;
+      border: 1.5px solid rgba(255,178,107,0.45);
+      color: var(--muted);
+      box-shadow: none;
+      font-weight: 400;
+    }
+    .ghost:hover { color: var(--cream); border-color: var(--gold); }
+
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+    .error { color: var(--error); min-height: 1.5em; margin: 0; font-size: 0.95rem; }
+    .small { font-size: 0.88rem; color: var(--muted); margin: 0; }
+    .hidden { visibility: hidden; }
+
+    .shake { animation: shake .35s ease; }
+    @keyframes shake {
+      20%  { transform: translateX(-7px); }
+      45%  { transform: translateX(6px); }
+      70%  { transform: translateX(-4px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* =====================================================
+       2. TYPED GREETING
+       ===================================================== */
+    .typed {
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.25rem, 5vw, 1.8rem);
+      color: var(--cream);
+      max-width: 28rem;
+      min-height: 9rem;
+      white-space: pre-line;
+      margin: 0;
+    }
+    .caret::after {
+      content: "";
+      display: inline-block;
+      width: 2px; height: 1.1em;
+      background: var(--gold);
+      margin-left: 3px;
+      vertical-align: -0.15em;
+      animation: blink .9s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* =====================================================
+       3. MINI GAME — catch the hearts
+       ===================================================== */
+    #game-area {
+      position: relative;
+      width: min(30rem, 100%);
+      height: min(58vh, 430px);
+      border-radius: 1.4rem;
+      border: 1.5px solid rgba(255,178,107,0.35);
+      background:
+        radial-gradient(500px 300px at 50% 110%, rgba(255,138,92,0.16), transparent 70%),
+        rgba(255,243,228,0.04);
+      overflow: hidden;
+      touch-action: manipulation;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -12%;
+      font-size: 1.7rem;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      animation: rise var(--dur) linear forwards;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    }
+    .heart span { display: inline-block; animation: sway 2.2s ease-in-out infinite alternate; }
+    @keyframes rise { to { bottom: 108%; } }
+    @keyframes sway { from { transform: translateX(-9px) rotate(-8deg); } to { transform: translateX(9px) rotate(8deg); } }
+
+    /* golden heart worth extra points */
+    .heart.special { filter: drop-shadow(0 0 14px rgba(255,201,113,0.95)); }
+    .heart.special span { animation: sway 1.6s ease-in-out infinite alternate, glowPulse 1.1s ease-in-out infinite; }
+    @keyframes glowPulse { 50% { filter: brightness(1.45); } }
+
+    .heart.popped { animation: pop .3s ease forwards !important; pointer-events: none; }
+    .heart.popped span { animation: none; }
+    @keyframes pop {
+      40%  { transform: scale(1.5); opacity: 1; }
+      100% { transform: scale(0.2); opacity: 0; }
+    }
+
+    /* little particle burst on catch */
+    .burst {
+      position: absolute; pointer-events: none;
+      font-size: 0.9rem;
+      transform: translate(-50%, -50%);
+      animation: burstFly var(--bdur, .7s) ease-out forwards;
+    }
+    @keyframes burstFly {
+      to { transform: translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(0.3) rotate(20deg); opacity: 0; }
+    }
+
+    /* floating "+N" score */
+    .float-score {
+      position: absolute; pointer-events: none;
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-style: italic; font-weight: 600;
+      font-size: 1.15rem; color: var(--cream);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transform: translate(-50%, 0);
+      animation: floatUp .9s ease-out forwards;
+    }
+    .float-score.combo { color: var(--gold); font-size: 1rem; }
+    @keyframes floatUp {
+      from { opacity: 0; transform: translate(-50%, 0) scale(0.6); }
+      30%  { opacity: 1; transform: translate(-50%, -10px) scale(1.15); }
+      to   { opacity: 0; transform: translate(-50%, -50px) scale(1); }
+    }
+
+    #progress-track {
+      width: min(30rem, 100%); height: 6px; border-radius: 999px;
+      background: rgba(255,243,228,0.1); overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--coral), var(--gold));
+      transition: width .45s cubic-bezier(.22,1,.36,1);
+    }
+
+    #game-done {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: .9rem; padding: 1.5rem;
+      background: rgba(31,18,32,0.84);
+      backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none;
+      transition: opacity .6s ease;
+    }
+    #game-done.show { opacity: 1; pointer-events: auto; }
+    #game-done p {
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-style: italic; font-size: 1.3rem; color: var(--cream); margin: 0; max-width: 20rem;
+    }
+
+    /* =====================================================
+       4. REASONS CARD
+       ===================================================== */
+    .card {
+      background: linear-gradient(160deg, rgba(255,138,92,0.18), rgba(232,106,146,0.16));
+      color: var(--cream);
+      border: 1.5px solid rgba(255,178,107,0.45);
+      border-radius: 1.4rem;
+      padding: 2.4rem 1.6rem;
+      width: min(26rem, 100%);
+      min-height: 10rem;
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      line-height: 1.55;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.45);
+      cursor: pointer;
+    }
+    .card:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: 0 18px 50px rgba(255,138,92,0.25); }
+    .card.flip { animation: flipIn .55s ease; }
+    @keyframes flipIn {
+      from { opacity: 0; transform: translateY(10px) rotateX(14deg); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* =====================================================
+       5. LETTER
+       ===================================================== */
+    .letter {
+      max-width: 34rem;
+      width: 100%;
+      text-align: left;
+      font-size: 1.05rem;
+      background: rgba(255,243,228,0.05);
+      border: 1px solid rgba(255,178,107,0.28);
+      border-radius: 1.4rem;
+      padding: 2.2rem 1.7rem;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+    }
+    .letter p {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      margin: 0 0 1.15rem;
+    }
+    .letter p.show { opacity: 1; transform: none; }
+    .letter p:first-child {
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-style: italic;
+      font-size: 1.45rem;
+      color: var(--peach);
+    }
+    .letter .closing {
+      margin-top: 1.6rem;
+      color: var(--muted);
+    }
+    .letter .sign {
+      font-family: "Fraunces Variable", Georgia, serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--cream);
+      margin: 0.3rem 0 0;
+    }
+    #reveal-all { align-self: center; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .letter p, .screen.active, .heart, .heart span, .rule::after, .glow, .twinkle { transition: none; animation: none; }
+      .letter p { opacity: 1; transform: none; }
+      .bg-hearts { display: none; }
+    }
+    @media (max-width: 480px) {
+      .letter { padding: 1.6rem 1.2rem; }
+    }
+  </style>
 </head>
 <body>
 
+  <!-- ambient sunset glow + twinkling lights -->
+  <div class="glow" id="glow-1" aria-hidden="true"></div>
+  <div class="glow" id="glow-2" aria-hidden="true"></div>
+  <div id="bg-twinkles" aria-hidden="true"></div>
+
+  <!-- decorative background hearts -->
+  <div class="bg-hearts" id="bg-hearts" aria-hidden="true"></div>
+
   <!-- 1. Password gate -->
   <section id="gate" class="screen active">
-    <h1>Hey, Cheeky Bones</h1>
-    <p>Enter the secret code to open this.</p>
+    <h1>Hey, CheekyBones</h1>
+    <div class="rule"></div>
+    <p class="sub">Enter the secret code to open this.</p>
     <input id="code" type="password" inputmode="numeric" placeholder="Hint: your birthday" autocomplete="off">
     <button id="unlock">Open</button>
     <p id="gate-error" class="error" role="alert"></p>
@@ -23,22 +422,30 @@
 
   <!-- 2. Typed greeting -->
   <section id="greeting" class="screen">
-    <p id="typed" class="typed" aria-live="polite"></p>
+    <p id="typed" class="typed caret" aria-live="polite"></p>
     <button id="to-game" class="hidden">Okay, I'm ready</button>
   </section>
 
-  <!-- 3. Mini game (placeholder: replace with the real game) -->
+  <!-- 3. Mini game — catch the hearts -->
   <section id="game" class="screen">
     <h2>One little thing first</h2>
+    <div class="rule"></div>
+    <p class="sub">Catch <strong id="goal-text">12</strong> hearts for me.</p>
     <div id="game-area">
-      <p>The game goes here.</p>
+      <div id="game-done">
+        <p>You caught them all — just like you caught me. 🤎</p>
+        <button id="game-continue">Keep going</button>
+      </div>
     </div>
-    <button id="to-reasons">Skip for now</button>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+    <p id="game-count" class="small">Hearts caught: 0 / 12</p>
+    <p class="small">Psst — the golden ones 💛 count double.</p>
   </section>
 
   <!-- 4. Reasons -->
   <section id="reasons" class="screen">
     <h2>Reasons I love you</h2>
+    <div class="rule"></div>
     <button id="reason-card" class="card" aria-live="polite"></button>
     <p id="reason-count" class="small"></p>
   </section>
@@ -46,9 +453,375 @@
   <!-- 5. Letter -->
   <section id="letter" class="screen">
     <article id="letter-body" class="letter"></article>
+    <button id="reveal-all" class="ghost hidden">Show it all</button>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <script src="script.js"></script>
+  <script>
+    /* ===== Content: edit all the words here ===== */
+
+    // SHA-256 of his birthday code (DDMMYYYY). See the note at the bottom to change it.
+    const CODE_HASH = "483cff56822c17da3cb58b8a039a4c12286e8ef84bd630df933c8a2157f148d9";
+
+    const GREETING = [
+      "Hi, CheekyBones.",
+      "I made something just for you.",
+      "You do so much for everybody else...",
+      "so this one is all yours."
+    ];
+
+    const REASONS = [
+      "You're the person I've been longing and praying for.",
+      "You pray for me, and for my family.",
+      "You comfort me and wipe my tears when I cry.",
+      "You want to see me happy in everything I do.",
+      "You go all out for me.",
+      "You're kind, loving, and you adore me.",
+      "I feel safe and secure with you.",
+      "You love me so much, and I love that you love me."
+    ];
+
+    /* -----------------------------------------------------------------
+       THE LETTER (final version — 6 short paragraphs, ~260 words)
+
+       ALTERNATIVE OPENING #1 (replace the 2nd item of LETTER to use it):
+       "Happy birthday, CheekyBones — yes, I know it's late. Nobody
+       celebrated you the way you deserved, and that didn't sit right
+       with me. You spend your whole life doing things for everybody
+       else, so I built you this little corner of the internet where
+       today, it's all about you."
+
+       ALTERNATIVE OPENING #2 (replace the 2nd item of LETTER to use it):
+       "I couldn't just let your birthday pass, CheekyBones. You always
+       go all out for everyone around you and never ask for anything
+       back, so this one is yours — every screen, every word. Consider
+       it the birthday you deserved."
+    ----------------------------------------------------------------- */
+    const LETTER = [
+      "My CheekyBones,",
+      "Nobody did anything for you on your birthday, and honestly, that's been sitting heavy on my heart. You're always the one doing everything for everybody else, so this time, you're the one being celebrated. Every screen of this little website? That's all for you.",
+      "You're the person I've been praying and longing for. You pray for me and for my family. You comfort me and wipe my tears when I cry. You want to see me happy in everything I do, and you go all out for me. You're kind, you're loving, and the way you adore me still surprises me.",
+      "I'll never forget that evening I was crying, scared for my friend who is sick and might be leaving. You came straight to me after work, tired as you were. You hugged me, told me it would be okay, wiped my tears, prayed with me, and gave me words of wisdom from God. I felt safe. I always feel safe with you.",
+      "We've only been together a few months, but you've already helped me through so much, and I feel closer to you than I've felt to anyone.",
+      "What I hope for us is simple: you and me, against all odds, against anything that tries to come between us. I want us to grow together, make more money, travel, enjoy this life, and keep working out until the day we die.",
+      "You're amazing, CheekyBones, and you deserve to hear it way more often. So here's your very late, very extra birthday. You earned every bit of it.",
+      { closing: "With all my love," },
+      { sign: "the female version of you 🤍" }
+    ];
+
+    /* ===== Screen flow ===== */
+
+    const $ = (id) => document.getElementById(id);
+
+    function show(id) {
+      document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+      $(id).classList.add("active");
+      if (id !== "game") stopGame();
+    }
+
+    /* ===== 1. Password gate ===== */
+
+    async function sha256(text) {
+      const bytes = new TextEncoder().encode(text);
+      const hash = await crypto.subtle.digest("SHA-256", bytes);
+      return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function tryUnlock() {
+      // Strip anything that isn't a digit so "04-09-1997" and "04091997" both work
+      const entered = $("code").value.replace(/\D/g, "");
+      if (entered && (await sha256(entered)) === CODE_HASH) {
+        show("greeting");
+        typeGreeting();
+      } else {
+        $("gate-error").textContent = "Hmm, that's not it. Try again, CheekyBones.";
+        $("code").classList.remove("shake");
+        void $("code").offsetWidth; // restart animation
+        $("code").classList.add("shake");
+      }
+    }
+
+    $("unlock").addEventListener("click", tryUnlock);
+    $("code").addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
+
+    /* ===== 2. Typed greeting ===== */
+
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    async function typeGreeting() {
+      const out = $("typed");
+      out.textContent = "";
+      for (const line of GREETING) {
+        for (const ch of line) {
+          out.textContent += ch;
+          await wait(45);
+        }
+        out.textContent += "\n";
+        await wait(700);
+      }
+      out.classList.remove("caret");
+      $("to-game").classList.remove("hidden");
+    }
+
+    $("to-game").addEventListener("click", () => {
+      show("game");
+      startGame();
+    });
+
+    /* ===== 3. Mini game — catch the hearts ===== */
+
+    const GOAL = 12;
+    const COMBO_WINDOW = 1300; // ms between catches to keep a streak
+    let caught = 0;
+    let combo = 0;
+    let lastCatch = 0;
+    let spawnTimer = null;
+    let gameActive = false;
+
+    function spawnHeart() {
+      if (!gameActive) return;
+      const area = $("game-area");
+
+      // ~22% chance of a golden heart worth double
+      const special = Math.random() < 0.22;
+      const glyph = special ? "💛" : (Math.random() < 0.5 ? "🤍" : "🤎");
+      const points = special ? 2 : 1;
+
+      const el = document.createElement("div");
+      el.className = "heart" + (special ? " special" : "");
+      el.dataset.points = points;
+      el.style.left = (4 + Math.random() * 88) + "%";
+      el.style.fontSize = (1.2 + Math.random() * 1.0) + "rem";
+      el.style.setProperty("--dur", (3.1 + Math.random() * 3.2) + "s");
+
+      const inner = document.createElement("span");
+      inner.textContent = glyph;
+      el.appendChild(inner);
+
+      el.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        if (el.classList.contains("popped")) return;
+        el.classList.add("popped");
+
+        const now = performance.now();
+        combo = (now - lastCatch < COMBO_WINDOW) ? combo + 1 : 1;
+        lastCatch = now;
+
+        const pts = +el.dataset.points;
+        caught += pts;
+        pop(el, pts);
+        setTimeout(() => el.remove(), 320);
+
+        if (caught >= GOAL) finishGame();
+      });
+
+      el.addEventListener("animationend", (e) => {
+        if (e.animationName === "rise") el.remove();
+      });
+
+      area.appendChild(el);
+    }
+
+    function pop(el, pts) {
+      const area = $("game-area");
+      const r = el.getBoundingClientRect();
+      const a = area.getBoundingClientRect();
+      const x = r.left - a.left + r.width / 2;
+      const y = r.top - a.top + r.height / 2;
+
+      // particle burst
+      const emojis = ["🤍", "🤎", "✨", "💛"];
+      for (let i = 0; i < 6; i++) {
+        const b = document.createElement("span");
+        b.className = "burst";
+        b.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        b.style.left = x + "px";
+        b.style.top = y + "px";
+        b.style.setProperty("--bx", (Math.random() * 90 - 45) + "px");
+        b.style.setProperty("--by", (-15 - Math.random() * 60) + "px");
+        b.style.setProperty("--bdur", (0.5 + Math.random() * 0.4) + "s");
+        area.appendChild(b);
+        setTimeout(() => b.remove(), 900);
+      }
+
+      // floating score
+      const f = document.createElement("span");
+      f.className = "float-score";
+      f.textContent = "+" + pts;
+      f.style.left = x + "px";
+      f.style.top = y + "px";
+      area.appendChild(f);
+      setTimeout(() => f.remove(), 900);
+
+      // combo streak message
+      if (combo >= 3) {
+        const c = document.createElement("span");
+        c.className = "float-score combo";
+        c.textContent = `streak ×${combo} 💞`;
+        c.style.left = x + "px";
+        c.style.top = (y - 28) + "px";
+        area.appendChild(c);
+        setTimeout(() => c.remove(), 1100);
+      }
+
+      updateGameCount();
+    }
+
+    function updateGameCount() {
+      const capped = Math.min(caught, GOAL);
+      $("game-count").textContent = `Hearts caught: ${capped} / ${GOAL}`;
+      $("progress-fill").style.width = (capped / GOAL * 100) + "%";
+    }
+
+    function startGame() {
+      if (gameActive) return;
+      caught = 0;
+      combo = 0;
+      lastCatch = 0;
+      gameActive = true;
+      updateGameCount();
+      $("game-done").classList.remove("show");
+      $("game-area").querySelectorAll(".heart, .burst, .float-score").forEach((h) => h.remove());
+      spawnHeart();
+      spawnTimer = setInterval(spawnHeart, 800);
+    }
+
+    function stopGame() {
+      gameActive = false;
+      clearInterval(spawnTimer);
+      spawnTimer = null;
+    }
+
+    function finishGame() {
+      stopGame();
+      $("game-area").querySelectorAll(".heart").forEach((h) => h.remove());
+      $("game-done").classList.add("show");
+      if (typeof confetti === "function") {
+        confetti({
+          particleCount: 70, spread: 65, origin: { y: 0.65 },
+          colors: ["#FFD59E", "#FF8A5C", "#FFF3E4", "#E86A92"]
+        });
+      }
+    }
+
+    function goToReasons() {
+      show("reasons");
+      showReason();
+    }
+
+    $("game-continue").addEventListener("click", goToReasons);
+
+    /* ===== 4. Reasons ===== */
+
+    let reasonIndex = 0;
+
+    function showReason() {
+      const card = $("reason-card");
+      card.textContent = REASONS[reasonIndex];
+      card.classList.remove("flip");
+      void card.offsetWidth;
+      card.classList.add("flip");
+      $("reason-count").textContent =
+        reasonIndex < REASONS.length - 1
+          ? `Tap the card for another (${reasonIndex + 1} of ${REASONS.length})`
+          : "That's the last one... for now. Tap for something else.";
+    }
+
+    $("reason-card").addEventListener("click", () => {
+      if (reasonIndex < REASONS.length - 1) {
+        reasonIndex++;
+        showReason();
+      } else {
+        show("letter");
+        revealLetter();
+      }
+    });
+
+    /* ===== 5. Letter + confetti ===== */
+
+    let revealing = false;
+    let revealSkip = false;
+
+    async function revealLetter() {
+      const body = $("letter-body");
+      body.innerHTML = "";
+      revealing = true;
+      revealSkip = false;
+      $("reveal-all").classList.remove("hidden");
+
+      const paragraphs = LETTER.map((item) => {
+        const p = document.createElement("p");
+        if (typeof item === "string") {
+          p.textContent = item;
+        } else if (item.closing) {
+          p.textContent = item.closing;
+          p.className = "closing";
+        } else {
+          p.textContent = item.sign;
+          p.className = "sign";
+        }
+        body.appendChild(p);
+        return p;
+      });
+
+      for (const p of paragraphs) {
+        if (revealSkip) { p.classList.add("show"); continue; }
+        p.classList.add("show");
+        await wait(1600);
+      }
+
+      revealing = false;
+      $("reveal-all").classList.add("hidden");
+      if (typeof confetti === "function") {
+        confetti({
+          particleCount: 160, spread: 80, origin: { y: 0.7 },
+          colors: ["#FFD59E", "#FF8A5C", "#FFF3E4", "#E86A92"]
+        });
+      }
+    }
+
+    $("reveal-all").addEventListener("click", () => {
+      if (revealing) revealSkip = true;
+    });
+
+    /* ===== Ambient background ===== */
+
+    (function seedBackground() {
+      // twinkling sparkle dots
+      const tw = $("bg-twinkles");
+      for (let i = 0; i < 22; i++) {
+        const d = document.createElement("span");
+        d.className = "twinkle";
+        d.style.left = (Math.random() * 100) + "%";
+        d.style.top = (Math.random() * 100) + "%";
+        d.style.setProperty("--twdur", (2.5 + Math.random() * 3.5) + "s");
+        d.style.animationDelay = (-Math.random() * 5) + "s";
+        tw.appendChild(d);
+      }
+      // floating hearts
+      const wrap = $("bg-hearts");
+      const glyphs = ["🤍", "🤎", "🫒", "💛"];
+      for (let i = 0; i < 14; i++) {
+        const s = document.createElement("span");
+        s.textContent = glyphs[i % glyphs.length];
+        s.style.left = (Math.random() * 100) + "%";
+        s.style.fontSize = (0.7 + Math.random() * 0.9) + "rem";
+        s.style.animationDuration = (16 + Math.random() * 22) + "s";
+        s.style.animationDelay = (-Math.random() * 30) + "s";
+        wrap.appendChild(s);
+      }
+    })();
+
+    /*
+      README note: to change the code, run in a terminal:
+        printf '04091997' | sha256sum
+      (replace the digits with the new DDMMYYYY) and paste the result into CODE_HASH.
+      Note: crypto.subtle needs https or localhost, so test with VS Code "Live Server",
+      not by double-clicking index.html. GitHub Pages is https, so it works there.
+      The two ALTERNATIVE opening paragraphs are in the comment block above the
+      LETTER array — just swap the second entry of LETTER with whichever you like.
+    */
+  </script>
+  <script src="extras.js"></script>
 </body>
 </html>
