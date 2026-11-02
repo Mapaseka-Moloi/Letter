@@ -15,7 +15,7 @@ const LETTER_PHOTO = "images/me.jpg";    // your photo (his favorite): backgroun
 
 /* PAGE 2: your voice + synced text. Record it, save as audio/greeting.mp3, then set GREETING_AUDIO.
    Leave "" to show the text typing on its own (no voice). */
-const GREETING_AUDIO = "audio/greeting.mp3";               // e.g. "audio/greeting.mp3"
+const GREETING_AUDIO = "audio/greeting.mp3";
 const GREETING_LINES = [
   "Molo Bab' Ntuli,",
   "Tshezi,",
@@ -23,8 +23,8 @@ const GREETING_LINES = [
   "Tenza,",
   "Fakade,",
   "Saliwa,",
-  "Jalamba,",  
-  "Mkhabela,", 
+  "Jalamba,",
+  "Mkhabela,",
   "Citshane!,",
   "Yalo",
   "Ntsindane,",
@@ -47,9 +47,9 @@ const GREETING_LINES = [
   "You do so much for everybody else...",
   "so this one is all yours."
 ];
-/* The second each line STARTS in your recording (one number per line, 18 in total).
+/* The second each line STARTS in your recording (one number per line, 29 in total).
    Get them by opening index.html#sync, playing the audio and tapping "Mark line" at each line. */
-const GREETING_CUES = [];
+const GREETING_CUES = [0.70, 3.05, 4.70, 6.35, 8.20, 10.00, 11.85, 13.55, 15.25, 17.35, 18.85, 20.75, 22.50, 26.05, 29.95, 32.90, 38.45, 41.45, 45.55, 53.00, 54.55, 56.55, 61.45, 63.15, 65.35, 70.05, 74.55, 77.60, 80.70];
 
 /* SONG: plays from the game page until the letter */
 const YT_ID = "qG2ii8poOjg";             // YouTube video id
