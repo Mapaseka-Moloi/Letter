@@ -1,17 +1,5 @@
 #game > .small:last-child { display: none; }
 
-/* Level 1: memory match */
-#game-area.match { height: auto; padding: 0.7rem; display: flex; flex-direction: column; gap: 0.6rem; }
-.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
-.mcard { position: relative; aspect-ratio: 1; padding: 0; border: none; background: none; box-shadow: none; border-radius: 0.8rem; perspective: 600px; }
-.mcard:hover { transform: none; filter: none; box-shadow: none; }
-.mcard .inner { position: absolute; inset: 0; transition: transform 0.5s; transform-style: preserve-3d; }
-.mcard.flipped .inner { transform: rotateY(180deg); }
-.face { position: absolute; inset: 0; border-radius: 0.8rem; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-.front { background: rgba(255, 243, 228, 0.1); border: 1.5px solid rgba(255, 178, 107, 0.4); }
-.back { transform: rotateY(180deg); background: var(--plum) center / cover; border: 2px solid var(--gold); }
-.mcard.matched .back { box-shadow: 0 0 14px rgba(255, 201, 113, 0.8); }
-.cap { margin: 0; min-height: 2.6em; font-family: "Fraunces Variable", Georgia, serif; font-style: italic; color: var(--cream); }
 
 /* Panels between levels */
 .panel { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1.5rem; }
@@ -51,8 +39,20 @@
 /* Reasons: photo cards */
 .card.photo { min-height: 24rem; align-items: flex-end; justify-content: flex-start; text-align: left; background-size: cover; background-position: center; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7); }
 
-/* Photo scene behind reasons + letter */
-#scene { position: fixed; inset: 0; z-index: 0; background-size: cover; background-position: center; opacity: 0; pointer-events: none; }
+/* Photo scene behind reasons + letter: the whole photo, sharp, over a blurred copy of itself */
+#scene { position: fixed; inset: 0; z-index: 0; opacity: 0; pointer-events: none; overflow: hidden; --photo: none; }
+#scene::before {
+  content: ""; position: absolute; inset: 0;
+  background: var(--photo) center / cover no-repeat;
+  filter: blur(24px);
+  transform: scale(1.12);            /* hides the soft edges the blur pulls in */
+}
+#scene::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(rgba(31, 18, 32, .3), rgba(31, 18, 32, .88)),
+    var(--photo) center / contain no-repeat;
+}
 #scene.on { opacity: 1; animation: sceneIn 1s ease; }
 @keyframes sceneIn { from { opacity: 0; } }
 body[data-screen="reasons"] #reasons.active { justify-content: flex-start; }
@@ -70,3 +70,14 @@ body[data-screen="letter"] .letter { background: rgba(31, 18, 32, 0.62); backdro
 .toast { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); padding: 0.45rem 1rem; border-radius: 999px; background: rgba(255, 201, 113, 0.18); border: 1px solid var(--gold); color: var(--cream); font-style: italic; white-space: nowrap; pointer-events: none; animation: floatUp 1.7s ease-out forwards; }
 .pill { position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 6; padding: 0.4rem 1rem; border-radius: 999px; background: rgba(31, 18, 32, 0.85); border: 1px solid rgba(255, 178, 107, 0.5); color: var(--cream); font-size: 0.85rem; animation: pillIn 0.6s ease both; }
 @keyframes pillIn { from { opacity: 0; } }
+
+/* Game: energy bar + her hearts */
+.energy { position: absolute; top: 0.6rem; left: 0.8rem; right: 0.8rem; z-index: 2; display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; color: var(--cream); pointer-events: none; }
+.etrack { flex: 1; height: 8px; border-radius: 999px; background: rgba(255, 243, 228, 0.12); overflow: hidden; }
+#efill { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--coral), var(--gold)); transition: width 0.3s ease; }
+#efill.low { background: var(--rose); animation: lowPulse 0.7s ease-in-out infinite alternate; }
+@keyframes lowPulse { to { opacity: 0.45; } }
+.ask.love { background: linear-gradient(135deg, rgba(255, 201, 113, 0.9), rgba(255, 138, 92, 0.9)); color: #3A1526; border-color: var(--gold); font-weight: 700; box-shadow: 0 0 18px rgba(255, 201, 113, 0.65); animation: askIn 0.3s ease, lovePulse 1s ease-in-out 0.3s infinite alternate; }
+@keyframes lovePulse { to { transform: scale(1.07); } }
+.ask.hit { background: rgba(232, 106, 146, 0.4); border-color: var(--rose); animation: hitShake 0.3s ease; }
+@keyframes hitShake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }

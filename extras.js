@@ -2,16 +2,16 @@
 
 /* 8 photos of the two of you: photo 1 is the background of reason 1, and so on */
 const PHOTOS = [
-  { src: "images/1.jpg", cap: "The day we ..." },
-  { src: "images/2.jpg", cap: "The day we ..." },
-  { src: "images/3.jpg", cap: "The day we ..." },
-  { src: "images/4.jpg", cap: "The day we ..." },
-  { src: "images/5.jpg", cap: "The day we ..." },
-  { src: "images/6.jpg", cap: "The day we ..." },
-  { src: "images/7.jpg", cap: "The day we ..." },
-  { src: "images/8.jpg", cap: "The day we ..." }
+  { src: "image/images/1.jpg" },
+  { src: "image/images/2.jpg" },
+  { src: "image/images/3.jpg" },
+  { src: "image/images/4.jpg" },
+  { src: "image/images/5.jpg" },
+  { src: "image/images/6.jpg" },
+  { src: "image/images/7.jpg" },
+  { src: "image/images/8.jpg" }
 ];
-const LETTER_PHOTO = "images/me.jpg";    // your photo (his favorite): background of the letter
+const LETTER_PHOTO = "image/images/9.jpg";    // your photo (his favorite): background of the letter
 
 /* PAGE 2: your voice + synced text. Record it, save as audio/greeting.mp3, then set GREETING_AUDIO.
    Leave "" to show the text typing on its own (no voice). */
@@ -84,8 +84,8 @@ const DEV = true;                        // previews: index.html#greeting / #syn
   document.body.appendChild(scene);
   function setScene(url) {
     scene.classList.remove("on");
-    if (!url) return;
-    scene.style.backgroundImage = `linear-gradient(rgba(31,18,32,.3), rgba(31,18,32,.88)), url('${url}')`;
+    if (!url) { scene.style.removeProperty("--photo"); return; }
+    scene.style.setProperty("--photo", `url('${url}')`);
     void scene.offsetWidth;
     scene.classList.add("on");
   }
@@ -171,7 +171,7 @@ const DEV = true;                        // previews: index.html#greeting / #syn
     };
   }
 
-  /* ---------- Page 3: game ---------- */
+  /* ---------- Page 3: game (one game: Everyone needs Cheeky Bones) ---------- */
   function panel(text, label, onClick) {
     const a = area();
     a.className = "";
@@ -188,84 +188,104 @@ const DEV = true;                        // previews: index.html#greeting / #syn
     later(() => e.remove(), 1700);
   }
 
-  // function level1() {
-  //   const a = area();
-  //   a.className = "match";
-  //   a.innerHTML = "";
-  //   setSub("Level 1: match our memories.");
-  //   setProgress(0, 6, "Pairs found");
-  //   const grid = el("div", "grid");
-  //   const cap = el("p", "cap", "Flip two cards to find a pair.");
-  //   const deck = PHOTOS.slice(0, 6).flatMap((_, i) => [i, i]).sort(() => Math.random() - 0.5);
-  //   let first = null, lock = false, found = 0;
+  const ASKS = ["Quick favor?", "Are you free?", "Can you help me?", "Sorry to bother you, but...",
+    "One tiny thing?", "Are you busy?", "You're the only one who can...", "Do you have a minute?"];
+  const LOVE = ["I'm proud of you", "Rest, my love", "You deserve this", "I love you, Cheeky Bones",
+    "Thank you for everything", "You're my favorite", "Come here, hug?", "Breathe. I've got you"];
 
-  //   deck.forEach((i) => {
-  //     const c = el("button", "mcard",
-  //       `<span class="inner"><span class="face front">🤍</span>` +
-  //       `<span class="face back" style="background-image:url('${PHOTOS[i].src}')"></span></span>`);
-  //     c.dataset.i = i;
-  //     c.setAttribute("aria-label", "Memory card");
-  //     c.onclick = () => {
-  //       if (lock || c.classList.contains("flipped")) return;
-  //       c.classList.add("flipped");
-  //       if (!first) { first = c; return; }
-  //       const other = first;
-  //       first = null;
-  //       lock = true;
-  //       if (other.dataset.i === c.dataset.i) {
-  //         other.classList.add("matched");
-  //         c.classList.add("matched");
-  //         cap.textContent = PHOTOS[i].cap;
-  //         setProgress(++found, 6, "Pairs found");
-  //         lock = false;
-  //         if (found === 6) later(() => panel("You remembered us. Now for the real test...", "Level 2", level2), 1500);
-  //       } else {
-  //         later(() => { other.classList.remove("flipped"); c.classList.remove("flipped"); lock = false; }, 800);
-  //       }
-  //     };
-  //     grid.appendChild(c);
-  //   });
-  //   a.append(grid, cap);
-  // }
-
-  function level1() {
+  /* Everyone needs Cheeky Bones: send requests away, catch my hearts to recharge */
+  function playGame(startHearts = 0) {
     const a = area();
     a.className = "";
-    a.innerHTML = "";
-    setSub("Level 2: everyone needs Cheeky Bones. Clear the requests.");
-    const ASKS = ["Quick favor?", "Are you free?", "Can you help me?", "Sorry to bother you, but...",
-      "One tiny thing?", "Are you busy?", "You're the only one who can...", "Do you have a minute?"];
-    const TOASTS = { 3: "Everyone needs you 😅", 6: "Still going, you legend", 8: "Save some energy for me 🤍" };
-    const GOAL = 10;
-    let n = 0;
-    setProgress(0, GOAL, "Requests cleared");
+    a.innerHTML = `<div class="energy"><span>⚡ Energy</span><div class="etrack"><i id="efill"></i></div></div>`;
+    setSub("Everyone needs Cheeky Bones. Send the requests away and catch my hearts to recharge.");
+    const GOAL = 8;
+    let energy = 100, hearts = startHearts, spawned = 0, over = false;
 
-    const spawn = () => {
-      const b = el("button", "ask", ASKS[Math.floor(Math.random() * ASKS.length)]);
-      b.style.left = (4 + Math.random() * 44) + "%";
-      b.style.top = (4 + Math.random() * 78) + "%";
+    const setEnergy = (v) => {
+      energy = Math.max(0, Math.min(100, v));
+      const f = $("efill");
+      if (!f) return;
+      f.style.width = energy + "%";
+      f.classList.toggle("low", energy < 35);
+    };
+    const burst = (b) => {
+      const r = b.getBoundingClientRect(), ar = a.getBoundingClientRect();
+      const x = r.left - ar.left + r.width / 2, y = r.top - ar.top + r.height / 2;
+      ["🤍", "💛", "✨", "🤍", "💛", "✨"].forEach((g) => {
+        const s = el("span", "burst", g);
+        s.style.left = x + "px";
+        s.style.top = y + "px";
+        s.style.setProperty("--bx", (Math.random() * 100 - 50) + "px");
+        s.style.setProperty("--by", (-20 - Math.random() * 60) + "px");
+        s.style.setProperty("--bdur", (0.5 + Math.random() * 0.4) + "s");
+        a.appendChild(s);
+        later(() => s.remove(), 900);
+      });
+    };
+    const speed = () => {
+      clearInterval(spawnIv);
+      spawnIv = setInterval(spawn, Math.max(450, 820 - hearts * 45));
+    };
+    const finish = () => {
+      over = true;
+      clearInterval(spawnIv);
+      a.querySelectorAll(".ask").forEach((b) => b.remove());
+    };
+    const win = () => {
+      finish();
+      if (typeof confetti === "function") confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      later(() => panel("Can I do something for you? 🤍", "Yes, please", goToReasons), 700);
+    };
+    const lose = () => {
+      finish();
+      later(() => panel("Everyone took everything out of you... let me recharge you 🤍", "Try again", () => playGame(hearts)), 400);
+    };
+
+    function spawn() {
+      if (over) return;
+      spawned++;
+      const love = spawned % 4 === 0 || Math.random() < 0.15;
+      const b = el("button", love ? "ask love" : "ask",
+        love ? "🤍 " + LOVE[Math.floor(Math.random() * LOVE.length)] : ASKS[Math.floor(Math.random() * ASKS.length)]);
+      b.style.left = (4 + Math.random() * 42) + "%";
+      b.style.top = (14 + Math.random() * 66) + "%";
+      let done = false;
       b.onclick = () => {
-        b.disabled = true;
-        b.textContent = "Not now 😌";
-        later(() => b.remove(), 350);
-        setProgress(++n, GOAL, "Requests cleared");
-        if (TOASTS[n]) toast(TOASTS[n]);
-        if (n >= GOAL) {
-          clearInterval(spawnIv);
-          later(() => panel("Can I do something for you? 🤍", "Yes, please", goToReasons), 700);
-        } else {                                   // it gets faster as he clears more
-          clearInterval(spawnIv);
-          spawnIv = setInterval(spawn, Math.max(420, 760 - n * 35));
+        if (done || over) return;
+        done = true;
+        if (love) {
+          burst(b);
+          b.remove();
+          setProgress(++hearts, GOAL, "Love collected");
+          setEnergy(energy + 15);
+          if (hearts >= GOAL) win(); else speed();
+        } else {
+          b.disabled = true;
+          b.textContent = "Not now 😌";
+          later(() => b.remove(), 350);
         }
       };
       a.appendChild(b);
-      later(() => b.remove(), 4200);
-    };
+      later(() => {
+        if (done || over) { return; }
+        done = true;
+        if (love) { b.remove(); return; }          // a heart that got away: nothing lost
+        b.classList.add("hit");                    // a request nobody answered drains him
+        if (navigator.vibrate) navigator.vibrate(60);
+        setEnergy(energy - 12);
+        later(() => b.remove(), 300);
+        if (energy <= 0) lose();
+      }, love ? 3000 : 3400);
+    }
+
+    setProgress(hearts, GOAL, "Love collected");
+    setEnergy(100);
     spawn();
-    spawnIv = setInterval(spawn, 760);
+    speed();
   }
 
-  window.startGame = () => { window.stopGame(); level1(); };
+  window.startGame = () => { window.stopGame(); playGame(); };
   window.stopGame = () => {
     clearInterval(spawnIv);
     timers.forEach(clearTimeout);
